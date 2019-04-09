@@ -4,12 +4,11 @@ if (array_key_exists('login', $_REQUEST) &&
  	require 'config.phplib';
 	$conn = pg_connect("user=".$CONFIG['username'].
 	    " dbname=".$CONFIG['database']);
-	$result = pg_query("SELECT * from users
-	    WHERE login='".$_REQUEST['login']."'
-	    AND password='".$_REQUEST['password']."'");
+	$result = pg_query_params($conn, "SELECT * from users
+	    WHERE login='$1' AND password='$2", array($_REQUEST['login'],$_REQUEST['password']));//This change is one that should help prevent the sql injection from easily accessing the database information since the user input is seperated from the developers content. This gap is what allows the sql from not allowing control characters to manipulate.
 	$row = pg_fetch_assoc($result);
 	if ($row === False) {
-		require 'header.php';
+		require 'header.php';	
 		print '<div class="err">Incorrect username/password</div>';
 		exit();
 	}
